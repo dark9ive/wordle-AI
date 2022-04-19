@@ -125,17 +125,3 @@ int game::q_check_exist(std::string input){
     return q_ht.count(input);
 }
 
-int main(){
-    game Game;
-    Game.print_status();
-    std::string str;
-    while(std::cin >> str){
-        if(Game.check_exist(str)){
-            Game.guess(str);
-        }
-        else{
-            std::cout << "Not in Dictionary!" << std::endl;
-        }
-    }
-    return 0;
-}

@@ -9,12 +9,12 @@ class AI;
 class AI_node{
     private:
         std::vector<int> indexlist;
-        int StrLen;
-        int correct_index;
         AI* DS;     //  Data Source
+        int ab(int depth);
+        int full(int depth);
     public:
         AI_node(std::vector<int> list, AI* ds);
-        int ab();
+        int solution(int depth, int mode);
 };
 class AI{
     private:
@@ -26,6 +26,8 @@ class AI{
     public:
         AI();
         std::string operator[](int IDX);
+        int psize();
+        int qsize();
         int getLen();
         int corrIDX();
         int getBucket(int filterIDX, int ansIDX);

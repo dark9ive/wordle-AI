@@ -1,6 +1,6 @@
 FINAL_TARGET    = Main
 O_DIR           = O
-SOURCES         = framework AI
+SOURCES         = framework AI main
 SRCS            = ${SOURCES:%=%.cpp}
 OBJS            = ${SRCS:%.cpp=$(O_DIR)/%.o}
 FLAGS       	= -std=c++11 -O2
