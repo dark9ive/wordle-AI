@@ -91,13 +91,13 @@ int game::test_ans(std::string input){
     for(int a = 0; a < StrLen; a++){
         if(input[a] == ans[a]){
             returnval += (2<<(2*a));
-            used[ans[a]-'a'] -= 1;
+            used[input[a]-'a'] -= 1;
         }
     }
     for(int a = 0; a < StrLen; a++){
-        if(used[input[a]-'a'] != 0){
-            used[input[a]-'a'] -= 1;
+        if(input[a] != ans[a] && used[input[a]-'a'] != 0){
             returnval += (1<<(2*a));
+            used[input[a]-'a'] -= 1;
         }
     }
     return returnval;
