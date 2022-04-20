@@ -1,6 +1,14 @@
 #include<iostream>
 #include<vector>
+
+#ifdef _WIN64
+#include<time.h>
+#elif _WIN32
+#include<time.h>
+#else
 #include<ctime>
+#endif
+
 #include"framework.h"
 #include"AI.h"
 
