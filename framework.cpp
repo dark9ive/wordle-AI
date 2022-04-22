@@ -1,6 +1,8 @@
 #include<iostream>
 #include<fstream>
 #include"framework.h"
+#include <ctime>
+
 
 #define MAX_TRIES 5
 
