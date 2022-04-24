@@ -29,9 +29,9 @@ class game{
         void start();
         int test_ans(std::string);
         int guess(std::string);
+        void set_ans(int index);
         int check_exist(std::string);
         int q_check_exist(std::string);
-        //friend class AI;
 };
 
 void read_to_vector(std::vector<std::string>&, std::string);

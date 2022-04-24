@@ -4,17 +4,21 @@
 
 class AI;
 
+#include<utility>
+#include<string>
 #include"framework.h"
 
 class AI_node{
     private:
         std::vector<int> indexlist;
         AI* DS;     //  Data Source
-        int ab(int depth);
-        int full(int depth);
     public:
         AI_node(std::vector<int> list, AI* ds);
-        int solution(int depth, int mode);
+        int operator[](int IDX);
+        int size();
+        std::pair<int, int> ab(int depth, int max_val_glob);
+        std::pair<int, int> full(int depth);
+        std::pair<int, int> full_exp(int depth);
 };
 class AI{
     private:
@@ -23,6 +27,8 @@ class AI{
         std::vector<std::vector<int>> bucket_arr;
         int StrLen;
         int correct_index;
+        AI_node* node;
+        int Mask;
     public:
         AI();
         std::string operator[](int IDX);
@@ -31,7 +37,9 @@ class AI{
         int getLen();
         int corrIDX();
         int getBucket(int filterIDX, int ansIDX);
-        void initBucket();
+        void initTable();
+        bool response(std::string str);
+        int solution(int depth, int mode);
 };
 
 #endif
