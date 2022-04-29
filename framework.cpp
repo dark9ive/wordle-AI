@@ -4,7 +4,7 @@
 #include <ctime>
 
 
-#define MAX_TRIES 10
+#define MAX_TRIES 6 // change to 6
 
 void read_to_vector(std::vector<std::string>& pool, std::string filename){
     std::ifstream infile(filename);
@@ -35,7 +35,7 @@ game::game(){
         correct_index += 2;
     }
     srand(clock());
-    start();
+    //start(); // not sure
 }
 
 void game::print_status(){
@@ -78,8 +78,9 @@ void game::random_ans(){
     return;
 }
 
-void game::start(){
-    random_ans();
+void game::start(std::string q){
+    //random_ans();  // set ans by human
+    ans = q; // set ans
     tries = MAX_TRIES;
     return;
 }
@@ -111,11 +112,11 @@ int game::guess(std::string input){
     print_result(returnval);
     if(returnval == correct_index){
         std::cout << "Congratulations, you've got the correct answer!" << std::endl;
-        start();
+        //start(); // no automatics start
     }
     if(returnval != 0 && tries == 0){
         std::cout << "Game Over!\nThe answer is: " << ans << std::endl;
-        start();
+        //start(); // no automatics start
     }
     return returnval;
 }
