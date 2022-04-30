@@ -59,9 +59,9 @@ int main(){
         int count = 0;
         while(1){
             int solu = ai.solution(1, 1);
-            std::cout << "Guess: " << ai[solu] << " " << std::endl; // show it
-            int res = Game.test_ans(ai[solu]);
-            //int res = Game.guess(ai[solu]);
+            std::cout << count + 1 << "; " << ai[solu] << "; " ; // show it, output count
+            //int res = Game.test_ans(ai[solu]);
+            int res = Game.guess(ai[solu]); // This statement show the path
             total_guess++;
             count++;
             std::string resstr;
@@ -88,8 +88,8 @@ int main(){
             std::cout << "AVG Guess @ " << a << ": " << ((double)total_guess)/a << std::endl;
         }
     }
-    std::cout << "AVG Guess @ 2315: " << ((double)total_guess)/input << std::endl; // change total to input
-    for(int a = 0; a < 6; a++){ // change to 6 time
+    std::cout << "AVG Guess: " << ((double)total_guess)/input << std::endl; // change total to input
+    for(int a = 1; a <= 6; a++){ // change to 6 time
         std::cout << "Words using " << a << " times of guessing: " << dist[a] << std::endl;
     }
     return 0;
