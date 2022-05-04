@@ -1,5 +1,4 @@
 #include<iostream>
-#include<fstream>
 #include"framework.h"
 #include <ctime>
 
@@ -22,7 +21,7 @@ void make_ht(std::unordered_set<std::string>& ht, std::vector<std::string> pool)
     return;
 }
 
-game::game(){
+game::game(std::string QFN, std::string TFN){
     read_to_vector(q_pool, QFN);
     pool = q_pool;              //  copy question dict to total pool.
     read_to_vector(pool, TFN);
@@ -35,46 +34,52 @@ game::game(){
         correct_index += 2;
     }
     srand(clock());
-    //start(); // not sure
+}
+
+game::game(std::string QFN){
+    read_to_vector(q_pool, QFN);
+    pool = q_pool;              //  copy question dict to total pool.
+    make_ht(ht, pool);
+    make_ht(q_ht, q_pool);
+    StrLen = pool[0].size();
+    correct_index = 0;
+    for(int a = 0; a < StrLen; a++){
+        correct_index <<= 2;
+        correct_index += 2;
+    }
+    srand(clock());
 }
 
 void game::print_status(){
     std::cout << "Total pool size: " << pool.size() << std::endl;
     std::cout << "Question pool size: " << q_pool.size() << std::endl;
     std::cout << "Current ans: " << ans << std::endl;
-    /*
-    for(int a = 0; a < 10; a++){
-        std::cout << pool[a] << std::endl;
-    }
-    for(int a = 0; a < 10; a++){
-        std::cout << q_pool[a] << std::endl;
-    }
-    */
 }
 
-void game::print_result(int val){
+std::string game::result(int val){
+    std::string returnval;
     for(int a = 0; a < StrLen; a++){
         if( a==0 )
-            std::cout << "\"";
+            returnval += "\"";
         else
-            std::cout << ","; // print some element
+            returnval += ","; // print some element
         switch(val & 3){
             case 0:
-                std::cout << "0"; // change '_' to '0'
+                returnval += "0"; // change '_' to '0'
                 break;
             case 1:
-                std::cout << "2"; // change '+' to '2'
+                returnval += "2"; // change '+' to '2'
                 break;
             case 2:
-                std::cout << "1"; // change 'V' to '1'
+                returnval += "1"; // change 'V' to '1'
                 break;
             default:
                 std::cerr << "Error!" << std::endl;
         }
         val >>= 2;
     }
-    std::cout << "\"" << std::endl;
-    return;
+    returnval += "\"\n";
+    return returnval;
 }
 
 void game::random_ans(){
@@ -82,10 +87,14 @@ void game::random_ans(){
     return;
 }
 
-void game::start(std::string q){
-    //random_ans();  // set ans by human
-    ans = q; // set ans
+void game::start(){
+    random_ans();
     tries = MAX_TRIES;
+    return;
+}
+
+void game::start(std::string q){
+    set_ans(q); // set ans
     return;
 }
 
@@ -111,24 +120,17 @@ int game::test_ans(std::string input){
 }
 
 int game::guess(std::string input){
-    //tries--; // no need for tries
     int returnval = test_ans(input);
-    print_result(returnval);
-    /*
-    if(returnval == correct_index){
-        std::cout << "Congratulations, you've got the correct answer!" << std::endl;
-        //start(); // no automatics start
-    }
-    if(returnval != 0 && tries == 0){
-        std::cout << "Game Over!\nThe answer is: " << ans << std::endl;
-        //start(); // no automatics start
-    }
-    */ // just for output stream
+    std::cout << result(returnval);
     return returnval;
 }
 
 void game::set_ans(int IDX){
     ans = q_pool[IDX];
+}
+
+void game::set_ans(std::string Ans){
+    ans = Ans;
 }
 
 int game::check_exist(std::string input){

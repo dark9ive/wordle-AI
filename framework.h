@@ -3,9 +3,7 @@
 #define frame_
 #include<unordered_set>
 #include<vector>
-
-#define QFN "./testdata/Question.txt"
-#define TFN "./testdata/Total.txt"
+#include<fstream>
 
 class game;
 
@@ -22,14 +20,17 @@ class game{
         int StrLen;
         int correct_index;
     public:
-        game();
+        game(std::string QFN, std::string TFN);
+        game(std::string QFN);
         void print_status();
-        void print_result(int);
+        std::string result(int);
         void random_ans();
+        void start();
         void start(std::string);
         int test_ans(std::string);
         int guess(std::string);
         void set_ans(int index);
+        void set_ans(std::string Ans);
         int check_exist(std::string);
         int q_check_exist(std::string);
 };

@@ -43,7 +43,7 @@ std::pair<int, int> AI_node::full_exp(int depth){
             if(recuans[b] == 0){
                 continue;
             }
-            exp_val += recuans[b]*log(recuans[b]);
+            exp_val += recuans[b]*log2(recuans[b]);
         }
         if (exp_val < min_val){
             min_IDX = a;
@@ -124,9 +124,11 @@ std::pair<int, int> AI_node::ab(int depth, int max_val_glob){
         return std::pair<int, int>(min_IDX, -1);
     }
     for(int a = 0; a < psize; a++){
+        /*
         if(depth == 2 && a%100 == 0){
             std::cout << a << std::endl;
         }
+        */
         std::vector<int> bucket[(DS->corrIDX())+1];
         for(int b = 0; b < qsize; b++){
             int bucketIDX = DS->getBucket(a, indexlist[b]);
@@ -155,16 +157,20 @@ std::pair<int, int> AI_node::ab(int depth, int max_val_glob){
         if (max_val < min_val){
             min_IDX = a;
             min_val = max_val;
+            /*
             if(depth == 2){
                 std::cout << "found better: " << (*DS)[a] << ", val = " << max_val << std::endl;
             }
+            */
         }
         else if(max_val == min_val && recuans[DS->corrIDX()] == 1){
             min_IDX = a;
             min_val = max_val;
+            /*
             if(depth == 2){
                 std::cout << "found better: " << (*DS)[a] << ", val = " << max_val << std::endl;
             }
+            */
         }
         if(min_val < max_val_glob){
             return std::pair<int, int>(-1, -1);
@@ -181,32 +187,41 @@ int AI_node::size(){
     return indexlist.size();
 }
 
-AI::AI(){
+AI::AI(std::string QFN, std::string TFN){
     read_to_vector(q_pool, QFN);
-    //
-    //  finish processing question pool.
-    //
     pool = q_pool;
     read_to_vector(pool, TFN);
-    //
-    //  finish processing total pool.
-    //
     StrLen = pool[0].size();
-    //  
-    //  count length of each question.
-    //
+
     correct_index = 0;
     for(int a = 0; a < StrLen; a++){
         correct_index <<= 2;
         correct_index += 2;
     }
-    //
-    //  finish calculating correct bucket index.
-    //
+
     initTable();
-    //
-    //  finish init lookup table.
-    //
+
+    std::vector<int> buf;
+    for(int a = 0; a < qsize(); a++){
+        buf.push_back(a);
+    }
+    node = new AI_node(buf, this);
+    return;
+}
+
+AI::AI(std::string QFN){
+    read_to_vector(q_pool, QFN);
+    pool = q_pool;
+    StrLen = pool[0].size();
+
+    correct_index = 0;
+    for(int a = 0; a < StrLen; a++){
+        correct_index <<= 2;
+        correct_index += 2;
+    }
+
+    initTable();
+
     std::vector<int> buf;
     for(int a = 0; a < qsize(); a++){
         buf.push_back(a);

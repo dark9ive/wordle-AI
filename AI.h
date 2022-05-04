@@ -30,7 +30,8 @@ class AI{
         AI_node* node;
         int Mask;
     public:
-        AI();
+        AI(std::string QFN);
+        AI(std::string QFN, std::string TFN);
         std::string operator[](int IDX);
         int psize();
         int qsize();
