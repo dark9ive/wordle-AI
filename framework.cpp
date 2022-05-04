@@ -4,7 +4,7 @@
 #include <ctime>
 
 
-#define MAX_TRIES 10
+#define MAX_TRIES 6 // change to 6
 
 void read_to_vector(std::vector<std::string>& pool, std::string filename){
     std::ifstream infile(filename);
@@ -35,7 +35,7 @@ game::game(){
         correct_index += 2;
     }
     srand(clock());
-    start();
+    //start(); // not sure
 }
 
 void game::print_status(){
@@ -54,22 +54,26 @@ void game::print_status(){
 
 void game::print_result(int val){
     for(int a = 0; a < StrLen; a++){
+        if( a==0 )
+            std::cout << "\"";
+        else
+            std::cout << ","; // print some element
         switch(val & 3){
             case 0:
-                std::cout << "_";
+                std::cout << "0"; // change '_' to '0'
                 break;
             case 1:
-                std::cout << "+";
+                std::cout << "2"; // change '+' to '2'
                 break;
             case 2:
-                std::cout << "V";
+                std::cout << "1"; // change 'V' to '1'
                 break;
             default:
                 std::cerr << "Error!" << std::endl;
         }
         val >>= 2;
     }
-    std::cout << std::endl;
+    std::cout << "\"" << std::endl;
     return;
 }
 
@@ -78,8 +82,9 @@ void game::random_ans(){
     return;
 }
 
-void game::start(){
-    random_ans();
+void game::start(std::string q){
+    //random_ans();  // set ans by human
+    ans = q; // set ans
     tries = MAX_TRIES;
     return;
 }
@@ -106,17 +111,19 @@ int game::test_ans(std::string input){
 }
 
 int game::guess(std::string input){
-    tries--;
+    //tries--; // no need for tries
     int returnval = test_ans(input);
     print_result(returnval);
+    /*
     if(returnval == correct_index){
         std::cout << "Congratulations, you've got the correct answer!" << std::endl;
-        start();
+        //start(); // no automatics start
     }
     if(returnval != 0 && tries == 0){
         std::cout << "Game Over!\nThe answer is: " << ans << std::endl;
-        start();
+        //start(); // no automatics start
     }
+    */ // just for output stream
     return returnval;
 }
 

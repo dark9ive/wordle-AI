@@ -26,7 +26,7 @@ class game{
         void print_status();
         void print_result(int);
         void random_ans();
-        void start();
+        void start(std::string);
         int test_ans(std::string);
         int guess(std::string);
         void set_ans(int index);
