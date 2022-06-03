@@ -186,7 +186,7 @@ int AI_node::operator[](int IDX){
 int AI_node::size(){
     return indexlist.size();
 }
-
+/*
 AI::AI(std::string QFN, std::string TFN){
     read_to_vector(q_pool, QFN);
     pool = q_pool;
@@ -208,7 +208,7 @@ AI::AI(std::string QFN, std::string TFN){
     node = new AI_node(buf, this);
     return;
 }
-
+*/
 AI::AI(std::string QFN){
     read_to_vector(q_pool, QFN);
     pool = q_pool;

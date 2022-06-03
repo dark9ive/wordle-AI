@@ -2,6 +2,10 @@
 #include<vector>
 #include<ctime>
 
+#include <cctype>
+#include <string>
+#include <algorithm>
+
 #include"framework.h"
 #include"AI.h"
 
@@ -92,6 +96,12 @@ void test(std::string QFN){
 }
 
 void HWMain(std::string QFN, std::string IFname, std::string OFname){
+
+    // seperate lower QFN and original QFN
+    std::string original_QFN = QFN;
+    transform(QFN.begin(),QFN.end(),QFN.begin(),tolower);
+    //
+
     std::vector<std::string> Qs;
     std::ifstream Infile(IFname);
     std::string bufline;
@@ -106,13 +116,26 @@ void HWMain(std::string QFN, std::string IFname, std::string OFname){
         Outfile << Qs[a] << std::endl;
         game Game(QFN);
         AI ai(QFN);
-        Game.start(Qs[a]);
+
+        // seperate lower Qs[a] and original Qs[a]
+        std::string original_QS = Qs[a];
+        transform(Qs[a].begin(),Qs[a].end(),Qs[a].begin(),tolower);
+        AI original_ai(original_QFN);
+        //
+        int temp; 
+        std::string temp_s;
+        // for original_res
+
+        Game.start(Qs[a], original_QS); // change, input two kinds of ans
         int count = 1;
         while(1){
             int solu = ai.solution(1, 1);
-            Outfile << count << "; " << ai[solu] << "; " ;
+            Outfile << count << "; " << ai[solu] << "; " ;  //show
+            int original_res = Game.test_original_ans(original_ai[solu]);  //use orignial ans for result
+            temp = original_res;
+            temp_s = original_ai[solu];
             int res = Game.test_ans(ai[solu]);
-            Outfile << Game.result(res);
+            Outfile << Game.result(original_res);  //use orignial ans for result
             std::string resstr;
             for(int b = 0; b < ai.getLen(); b++){
                 switch(res&3){
@@ -129,11 +152,39 @@ void HWMain(std::string QFN, std::string IFname, std::string OFname){
                 res >>= 2;
             }
             if(ai.response(resstr)){
-                Outfile << count << std::endl;
+                //Outfile << count << std::endl;
                 break;
             }
             count++;
         }
+        //
+        // last count if we need
+        int last_count = 0;
+        for(int i = 0; i < ai.getLen(); i++){
+            switch(temp & 7){
+                case 3:
+                    last_count = 1;
+                    if( temp_s[i]-'a' >= 0 ){
+                        temp_s[i] -= 32;
+                    }
+                    else{
+                        temp_s[i] += 32;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            temp >>= 3;
+        }
+        //std::cout << temp_s << std::endl;
+        if(last_count == 1){
+            count++;
+            Outfile << count << "; " << temp_s << "; ";
+            int final = Game.test_original_ans(temp_s);
+            Outfile << Game.result(final);
+        }
+        //
+        Outfile << count << std::endl;
     }
     Outfile.close();
 }

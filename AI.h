@@ -31,7 +31,7 @@ class AI{
         int Mask;
     public:
         AI(std::string QFN);
-        AI(std::string QFN, std::string TFN);
+        //AI(std::string QFN, std::string TFN);
         std::string operator[](int IDX);
         int psize();
         int qsize();

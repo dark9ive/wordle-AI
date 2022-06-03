@@ -16,18 +16,21 @@ class game{
         std::unordered_set<std::string> ht;
         std::unordered_set<std::string> q_ht;
         std::string ans;
+        std::string original_ans; // new
         int tries;
         int StrLen;
         int correct_index;
     public:
-        game(std::string QFN, std::string TFN);
+        //game(std::string QFN, std::string TFN);
         game(std::string QFN);
         void print_status();
         std::string result(int);
         void random_ans();
         void start();
         void start(std::string);
+        void start(std::string, std::string); // new
         int test_ans(std::string);
+        int test_original_ans(std::string); // new
         int guess(std::string);
         void set_ans(int index);
         void set_ans(std::string Ans);

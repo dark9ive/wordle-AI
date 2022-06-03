@@ -20,7 +20,7 @@ void make_ht(std::unordered_set<std::string>& ht, std::vector<std::string> pool)
     }
     return;
 }
-
+/*
 game::game(std::string QFN, std::string TFN){
     read_to_vector(q_pool, QFN);
     pool = q_pool;              //  copy question dict to total pool.
@@ -35,7 +35,7 @@ game::game(std::string QFN, std::string TFN){
     }
     srand(clock());
 }
-
+*/
 game::game(std::string QFN){
     read_to_vector(q_pool, QFN);
     pool = q_pool;              //  copy question dict to total pool.
@@ -58,25 +58,32 @@ void game::print_status(){
 
 std::string game::result(int val){
     std::string returnval;
+    //std::cout<<val<<std::endl;
     for(int a = 0; a < StrLen; a++){
         if( a==0 )
             returnval += "\"";
         else
             returnval += ","; // print some element
-        switch(val & 3){
+        switch(val & 7){
             case 0:
                 returnval += "0"; // change '_' to '0'
                 break;
             case 1:
-                returnval += "2"; // change '+' to '2'
+                returnval += "1"; // change 'V' to '1'
                 break;
             case 2:
-                returnval += "1"; // change 'V' to '1'
+                returnval += "2"; // change '+' to '2'
+                break;
+            case 3:
+                returnval += "3";
+                break;
+            case 4:
+                returnval += "4";
                 break;
             default:
                 std::cerr << "Error!" << std::endl;
         }
-        val >>= 2;
+        val >>= 3;
     }
     returnval += "\"\n";
     return returnval;
@@ -98,6 +105,12 @@ void game::start(std::string q){
     return;
 }
 
+void game::start(std::string q, std::string o_q){
+    set_ans(q); // set ans
+    original_ans = o_q;
+    return;
+}
+
 int game::test_ans(std::string input){
     int returnval = 0;
     int used[26] = {0};
@@ -114,6 +127,56 @@ int game::test_ans(std::string input){
         if(input[a] != ans[a] && used[input[a]-'a'] != 0){
             returnval += (1<<(2*a));
             used[input[a]-'a'] -= 1;
+        }
+    }
+    return returnval;
+}
+
+int game::test_original_ans(std::string input){
+    int returnval = 0;
+    //int used[26] = {0};
+    int original_used[58] = {0};
+    //for(int a = 0; a < StrLen; a++){
+    //    used[ans[a]-'a'] += 1;
+    //}
+    for(int a = 0; a < StrLen; a++){
+        original_used[original_ans[a]-'A'] += 1;
+    }    
+
+    for(int a = 0; a < StrLen; a++){
+        if(input[a] == ans[a] || input[a]+32 == ans[a]){
+            //std::cout << input[a] << ", " << original_ans[a] << std::endl;
+            if(input[a] == original_ans[a]){
+                returnval += (1<<(3*a));
+            }           
+            else{
+                returnval += (3<<(3*a));
+            }     
+            original_used[input[a]-'A'] -= 1;
+        }
+    }
+    for(int a = 0; a < StrLen; a++){
+        if(input[a] != ans[a] || input[a]+32 != ans[a])
+            continue;
+        if(input[a] != original_ans[a] && original_used[input[a]-'A'] != 0){
+            returnval += (2<<(3*a));
+            original_used[input[a]-'A'] -= 1;
+            continue;
+        }             
+        // special for "4" only get the sub
+        if(input[a] != original_ans[a] && original_used[input[a]-'A'] == 0){
+            if( input[a]-'a' >= 0 ){
+                if(original_used[input[a]-'A'-32] != 0){
+                    returnval += (4<<(3*a));
+                    original_used[input[a]-'A'-32] -= 1;
+                }
+            }
+            else{
+                if(original_used[input[a]-'A'+32] != 0){
+                    returnval += (4<<(3*a));
+                    original_used[input[a]-'A'+32] -= 1;
+                }                
+            }
         }
     }
     return returnval;
