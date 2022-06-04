@@ -22,7 +22,7 @@ class game{
         int correct_index;
     public:
         //game(std::string QFN, std::string TFN);
-        game(std::string QFN);
+        game(std::string QFN, int i);
         void print_status();
         std::string result(int);
         void random_ans();
@@ -32,8 +32,9 @@ class game{
         int test_ans(std::string);
         int test_original_ans(std::string); // new
         int guess(std::string);
-        void set_ans(int index);
+        std::string set_ans(int index);
         void set_ans(std::string Ans);
+        void set_original_ans(int IDX, std::string tolower);
         int check_exist(std::string);
         int q_check_exist(std::string);
 };

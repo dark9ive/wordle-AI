@@ -209,8 +209,16 @@ AI::AI(std::string QFN, std::string TFN){
     return;
 }
 */
-AI::AI(std::string QFN){
+AI::AI(std::string QFN, int i){
     read_to_vector(q_pool, QFN);
+    if( i == 1 ){
+        for(int l=0; l<q_pool.size(); l++){
+            for(auto& c : q_pool[l]){
+                c = tolower(c);
+            }
+        }
+    }
+    //std::cout<<q_pool[0]<<std::endl;
     pool = q_pool;
     StrLen = pool[0].size();
 
@@ -218,15 +226,28 @@ AI::AI(std::string QFN){
     for(int a = 0; a < StrLen; a++){
         correct_index <<= 2;
         correct_index += 2;
-    }
+    }/*
+    if( i == 0 ){
+        for(int l=0; l<q_pool.size(); l++){
+            for(auto& c : q_pool[l]){
+                c = tolower(c);
+            }
+        }
+        for(int l=0; l<pool.size(); l++){
+            for(auto& c : pool[l]){
+                c = tolower(c);
+            }
+        }
+    }*/
+    if( i == 1 ){
+        initTable();
 
-    initTable();
-
-    std::vector<int> buf;
-    for(int a = 0; a < qsize(); a++){
-        buf.push_back(a);
+        std::vector<int> buf;
+        for(int a = 0; a < qsize(); a++){
+            buf.push_back(a);
+        }
+        node = new AI_node(buf, this);
     }
-    node = new AI_node(buf, this);
     return;
 }
 

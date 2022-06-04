@@ -10,6 +10,8 @@
 #include"AI.h"
 
 #define MainMode 0
+#define TOTAL 2500
+
 /*
 int human_play(){
     game Game;
@@ -49,16 +51,38 @@ int ai_solve(){
 }
 */
 void test(std::string QFN){
-    game Game(QFN);
+
+    // seperate lower QFN and original QFN
+    std::string original_QFN = QFN;
+    //transform(QFN.begin(),QFN.end(),QFN.begin(),tolower);
+    //
+
+    game Game(QFN, 1);
+    game Original_Game(original_QFN, 0);
     int total_guess = 0;
     std::vector<int> dist(11, 0);
-    for(int a = 0; a < 2315; a++){
-        Game.set_ans(a);
-        AI ai(QFN);
+    for(int a = 0; a < TOTAL; a++){
+        std::string send = Game.set_ans(a);
+        Original_Game.set_original_ans(a, send);
+        //std::cout<<send<<std::endl;
+        AI ai(QFN, 1);        
+        AI original_ai(original_QFN, 0);
+        //
+        int temp; 
+        std::string temp_s;
+        // for original_res
+
+
         int count = 0;
         while(1){
+
             int solu = ai.solution(1, 1);
             int res = Game.test_ans(ai[solu]);
+
+            int original_res = Original_Game.test_original_ans(original_ai[solu]);  //use orignial ans for result
+            temp = original_res;
+            temp_s = original_ai[solu];
+
             total_guess++;
             count++;
             std::string resstr;
@@ -77,10 +101,40 @@ void test(std::string QFN){
                 res >>= 2;
             }
             if(ai.response(resstr)){
-                dist[count]++;
+                //dist[count]++;
                 break;
             }
         }
+        //
+        // last count if we need
+        //std::cout<<temp_s<<std::endl;
+        int last_count = 0;
+        for(int i = 0; i < ai.getLen(); i++){
+            switch(temp & 7){
+                case 3:
+                    //std::cout<<"."<<std::endl;
+                    last_count = 1;
+                    if( temp_s[i]-'a' >= 0 ){
+                        temp_s[i] -= 32;
+                    }
+                    else{
+                        temp_s[i] += 32;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            temp >>= 3;
+        }
+        //std::cout << temp_s << std::endl;
+        if(last_count == 1){
+            //std::cout<<"_"<<std::endl;
+            total_guess++;
+            count++;
+            int final = Original_Game.test_original_ans(temp_s);
+        }
+        dist[count]++;
+        //
         if(a%100 == 0 && a != 0){
             std::cout << "AVG Guess @ " << a << ": " << ((double)total_guess)/a << std::endl;
             for(int b = 1; b <= 10; b++){
@@ -88,18 +142,20 @@ void test(std::string QFN){
             }
         }
     }
-    std::cout << "AVG Guess @ " << 2315 << ": " << ((double)total_guess)/2315 << std::endl;
+    std::cout << "AVG Guess @ " << TOTAL << ": " << ((double)total_guess)/TOTAL << std::endl;
     for(int a = 1; a <= 10; a++){
         std::cout << "Words using " << a << " times of guessing: " << dist[a] << std::endl;
     }
     return;
 }
 
+
+
 void HWMain(std::string QFN, std::string IFname, std::string OFname){
 
     // seperate lower QFN and original QFN
     std::string original_QFN = QFN;
-    transform(QFN.begin(),QFN.end(),QFN.begin(),tolower);
+    //transform(QFN.begin(),QFN.end(),QFN.begin(),tolower);
     //
 
     std::vector<std::string> Qs;
@@ -114,27 +170,32 @@ void HWMain(std::string QFN, std::string IFname, std::string OFname){
 
     for(int a = 0; a < Qs.size(); a++){
         Outfile << Qs[a] << std::endl;
-        game Game(QFN);
-        AI ai(QFN);
+        game Game(QFN,1);
+        //game Original_Game(original_QFN, 0);
+        AI ai(QFN, 1);
 
         // seperate lower Qs[a] and original Qs[a]
         std::string original_QS = Qs[a];
         transform(Qs[a].begin(),Qs[a].end(),Qs[a].begin(),tolower);
-        AI original_ai(original_QFN);
+        AI original_ai(original_QFN, 0);
         //
         int temp; 
         std::string temp_s;
         // for original_res
 
         Game.start(Qs[a], original_QS); // change, input two kinds of ans
+        //Original_Game.start(Qs[a], original_QS);
         int count = 1;
         while(1){
             int solu = ai.solution(1, 1);
-            Outfile << count << "; " << ai[solu] << "; " ;  //show
+            Outfile << count << "; " << original_ai[solu] << "; " ;  //show
             int original_res = Game.test_original_ans(original_ai[solu]);  //use orignial ans for result
             temp = original_res;
             temp_s = original_ai[solu];
             int res = Game.test_ans(ai[solu]);
+            //
+            //std::cout<<original_ai[solu]<<" vs "<<ai[solu]<<std::endl;
+            //
             Outfile << Game.result(original_res);  //use orignial ans for result
             std::string resstr;
             for(int b = 0; b < ai.getLen(); b++){
@@ -204,7 +265,7 @@ int main(int argc, char* argv[]){
             break;
         case 1:
             if(argc != 2){
-                std::cerr << "Usage: " << argv[0] << " <Wordlist> <Answer_list> <Output_file>" << std::endl;
+                std::cerr << "Usage: " << argv[0] << " <Wordlist>" << std::endl;
             }
             else{
                 std::string QFN(argv[1]);

@@ -2,6 +2,9 @@
 #include"framework.h"
 #include <ctime>
 
+#include <cctype>
+#include <string>
+#include <algorithm>
 
 #define MAX_TRIES 6 // change to 6
 
@@ -36,8 +39,16 @@ game::game(std::string QFN, std::string TFN){
     srand(clock());
 }
 */
-game::game(std::string QFN){
+game::game(std::string QFN, int i){
     read_to_vector(q_pool, QFN);
+    if( i == 1 ){
+        for(int l=0; l<q_pool.size(); l++){
+            for(auto& c : q_pool[l]){
+                c = tolower(c);
+            }
+        }
+    }
+    //std::cout<<q_pool[0]<<std::endl;
     pool = q_pool;              //  copy question dict to total pool.
     make_ht(ht, pool);
     make_ht(q_ht, q_pool);
@@ -156,7 +167,7 @@ int game::test_original_ans(std::string input){
         }
     }
     for(int a = 0; a < StrLen; a++){
-        if(input[a] != ans[a] || input[a]+32 != ans[a])
+        if(input[a] == ans[a] || input[a]+32 == ans[a])
             continue;
         if(input[a] != original_ans[a] && original_used[input[a]-'A'] != 0){
             returnval += (2<<(3*a));
@@ -188,8 +199,14 @@ int game::guess(std::string input){
     return returnval;
 }
 
-void game::set_ans(int IDX){
+std::string game::set_ans(int IDX){
     ans = q_pool[IDX];
+    return ans;
+}
+
+void game::set_original_ans(int IDX, std::string tolower){
+    original_ans = q_pool[IDX];
+    ans = tolower;
 }
 
 void game::set_ans(std::string Ans){
