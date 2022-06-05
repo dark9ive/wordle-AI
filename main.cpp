@@ -10,7 +10,7 @@
 #include"AI.h"
 
 #define MainMode 0
-#define TOTAL 2500
+#define TOTAL 5000
 
 /*
 int human_play(){
@@ -188,6 +188,7 @@ void HWMain(std::string QFN, std::string IFname, std::string OFname){
         int count = 1;
         while(1){
             int solu = ai.solution(1, 1);
+            //std::cout << solu << std::endl;
             Outfile << count << "; " << original_ai[solu] << "; " ;  //show
             int original_res = Game.test_original_ans(original_ai[solu]);  //use orignial ans for result
             temp = original_res;

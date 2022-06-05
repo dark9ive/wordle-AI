@@ -18,6 +18,11 @@ std::pair<int, int> AI_node::full_exp(int depth){
         return std::pair<int, int>(min_IDX, -1);
     }
     for(int a = 0; a < psize; a++){
+        //
+        //if( operator[](a) == operator[](a-1) ){
+        //    continue;
+        //}
+        //
         if(depth == 2){
             std::cout << a << std::endl;
         }
@@ -39,12 +44,17 @@ std::pair<int, int> AI_node::full_exp(int depth){
             }
         }
         int exp_val = 0;
-        for(int b = 0; b < (DS->corrIDX())+1; b++){
+        for(int b = 0; b < (DS->corrIDX())+1; b++){            
             if(recuans[b] == 0){
                 continue;
             }
             exp_val += recuans[b]*log2(recuans[b]);
+            //std::cout << recuans[b] << std::endl;
         }
+        //if(exp_val<=2){
+        //    std::cout <<"a = "<<a <<  " exp = "<<exp_val<< ", minval = "<<min_val<<", idx = "<<min_IDX << std::endl;
+        //}
+        
         if (exp_val < min_val){
             min_IDX = a;
             min_val = exp_val;
@@ -53,8 +63,9 @@ std::pair<int, int> AI_node::full_exp(int depth){
                 std::cout << "found better: " << (*DS)[a] << ", val = " << exp_val << std::endl;
             }
             */
+            //std::cout << "if found better: " << (*DS)[a] << ", val = " << min_val << ", a = "<< min_IDX<< std::endl;
         }
-        else if(exp_val == min_val && recuans[DS->corrIDX()] == 1){
+        else if(exp_val == min_val && recuans[DS->corrIDX()] >= 1){
             min_IDX = a;
             min_val = exp_val;
             /*
@@ -62,7 +73,14 @@ std::pair<int, int> AI_node::full_exp(int depth){
                 std::cout << "found better: " << (*DS)[a] << ", val = " << exp_val << std::endl;
             }
             */
+            //std::cout << "else if found better: " << (*DS)[a] << ", val = " << min_val << ", a = "<< min_IDX<< std::endl;
         }
+        /*
+        else if(exp_val == min_val && recuans[DS->corrIDX()] == 2){
+            min_IDX = a;
+            min_val = exp_val;
+        }
+        */
     }
     return std::pair<int, int>(min_IDX, min_val);
 }
@@ -176,6 +194,7 @@ std::pair<int, int> AI_node::ab(int depth, int max_val_glob){
             return std::pair<int, int>(-1, -1);
         }
     }
+    
     return std::pair<int, int>(min_IDX, min_val);
 }
 
