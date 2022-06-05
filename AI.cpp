@@ -1,6 +1,7 @@
 #include<algorithm>
 #include<iostream>
 #include<math.h>
+#include<unistd.h>
 #include"AI.h"
 
 
@@ -21,25 +22,25 @@ std::pair<int, int> AI_node::full_exp(int depth){
         if(depth == 2){
             std::cout << a << std::endl;
         }
-        std::vector<int> bucket[(DS->corrIDX())+1];
+        std::vector<int> bucket[(DS->maxBKT())+1];
         for(int b = 0; b < qsize; b++){
             int bucketIDX = DS->getBucket(a, indexlist[b]);
             bucket[bucketIDX].push_back(indexlist[b]);
         }
-        int recuans[(DS->corrIDX())+1] = {0};
+        int recuans[(DS->maxBKT())+1] = {0};
         if(depth > 1){
-            for(int b = 0; b < ((DS->corrIDX())+1); b++){
+            for(int b = 0; b < ((DS->maxBKT())+1); b++){
                 AI_node node(bucket[b], DS);
                 recuans[b] = node.full(depth-1).second;
             }
         }
         else{
-            for(int b = 0; b < ((DS->corrIDX())+1); b++){
+            for(int b = 0; b < ((DS->maxBKT())+1); b++){
                 recuans[b] = bucket[b].size();
             }
         }
         int exp_val = 0;
-        for(int b = 0; b < (DS->corrIDX())+1; b++){
+        for(int b = 0; b < (DS->maxBKT())+1; b++){
             if(recuans[b] == 0){
                 continue;
             }
@@ -54,7 +55,7 @@ std::pair<int, int> AI_node::full_exp(int depth){
             }
             */
         }
-        else if(exp_val == min_val && recuans[DS->corrIDX()] == 1){
+        else if(exp_val == min_val && recuans[DS->corrBKT()] == 1){
             min_IDX = a;
             min_val = exp_val;
             /*
@@ -79,35 +80,35 @@ std::pair<int, int> AI_node::full(int depth){
         if(depth == 2){
             std::cout << a << std::endl;
         }
-        std::vector<int> bucket[(DS->corrIDX())+1];
+        std::vector<int> bucket[(DS->maxBKT())+1];
         for(int b = 0; b < qsize; b++){
             int bucketIDX = DS->getBucket(a, indexlist[b]);
             bucket[bucketIDX].push_back(indexlist[b]);
         }
-        int recuans[(DS->corrIDX())+1] = {0};
+        int recuans[(DS->maxIDX())+1] = {0};
         if(depth > 1){
-            for(int b = 0; b < ((DS->corrIDX())+1); b++){
+            for(int b = 0; b < ((DS->maxBKT())+1); b++){
                 AI_node node(bucket[b], DS);
                 recuans[b] = node.full(depth-1).second;
             }
         }
         else{
-            for(int b = 0; b < ((DS->corrIDX())+1); b++){
+            for(int b = 0; b < ((DS->maxBKT())+1); b++){
                 recuans[b] = bucket[b].size();
             }
         }
-        int max_val = *std::max_element(recuans, recuans+((DS->corrIDX())+1));
+        int max_val = *std::max_element(recuans, recuans+((DS->maxBKT())+1));
         if (max_val < min_val){
             min_IDX = a;
             min_val = max_val;
-            if(depth == 2){
+            if(depth == 1){
                 std::cout << "found better: " << (*DS)[a] << ", val = " << max_val << std::endl;
             }
         }
-        else if(max_val == min_val && recuans[DS->corrIDX()] == 1){
+        else if(max_val == min_val && recuans[DS->corrBKT()] == 1){
             min_IDX = a;
             min_val = max_val;
-            if(depth == 2){
+            if(depth == 1){
                 std::cout << "found better: " << (*DS)[a] << ", val = " << max_val << std::endl;
             }
         }
@@ -120,6 +121,7 @@ std::pair<int, int> AI_node::ab(int depth, int max_val_glob){
     int qsize = indexlist.size();
     int min_IDX = -1;
     int min_val = 0x7FFFFFFF;
+    std::cout << psize << " " << qsize << std::endl;
     if(qsize == 0){
         return std::pair<int, int>(min_IDX, -1);
     }
@@ -129,16 +131,16 @@ std::pair<int, int> AI_node::ab(int depth, int max_val_glob){
             std::cout << a << std::endl;
         }
         */
-        std::vector<int> bucket[(DS->corrIDX())+1];
+        std::vector<int> bucket[(DS->maxBKT())+1];
         for(int b = 0; b < qsize; b++){
             int bucketIDX = DS->getBucket(a, indexlist[b]);
             bucket[bucketIDX].push_back(indexlist[b]);
         }
 
-        int recuans[(DS->corrIDX())+1] = {0};
+        int recuans[(DS->maxBKT())+1] = {0};
         int max_val = 0x80000000;
 
-        for(int b = 0; b < ((DS->corrIDX())+1); b++){
+        for(int b = 0; b < ((DS->maxBKT())+1); b++){
             if(depth > 1){
                 AI_node node(bucket[b], DS);
                 recuans[b] = node.ab(depth-1, max_val).second;
@@ -163,7 +165,7 @@ std::pair<int, int> AI_node::ab(int depth, int max_val_glob){
             }
             */
         }
-        else if(max_val == min_val && recuans[DS->corrIDX()] == 1){
+        else if(max_val == min_val && recuans[DS->corrBKT()] == 1){
             min_IDX = a;
             min_val = max_val;
             /*
@@ -187,40 +189,28 @@ int AI_node::size(){
     return indexlist.size();
 }
 
-AI::AI(std::string QFN, std::string TFN){
-    read_to_vector(q_pool, QFN);
-    pool = q_pool;
-    read_to_vector(pool, TFN);
-    StrLen = pool[0].size();
-
-    correct_index = 0;
-    for(int a = 0; a < StrLen; a++){
-        correct_index <<= 2;
-        correct_index += 2;
-    }
-
-    initTable();
-
-    std::vector<int> buf;
-    for(int a = 0; a < qsize(); a++){
-        buf.push_back(a);
-    }
-    node = new AI_node(buf, this);
-    return;
-}
-
 AI::AI(std::string QFN){
     read_to_vector(q_pool, QFN);
     pool = q_pool;
     StrLen = pool[0].size();
 
     correct_index = 0;
+    max_index = 0;
+    correct_bucket = 0;
+    max_bucket = 0;
     for(int a = 0; a < StrLen; a++){
-        correct_index <<= 2;
-        correct_index += 2;
+        correct_index <<= 3;
+        correct_index += 1;
+        max_index <<= 3;
+        max_index += 4;
+        correct_bucket <<= 2;
+        correct_bucket += 1;
+        max_bucket <<= 2;
+        max_bucket += 2;
     }
 
     initTable();
+    caps.resize(StrLen, 0);
 
     std::vector<int> buf;
     for(int a = 0; a < qsize(); a++){
@@ -250,6 +240,18 @@ int AI::corrIDX(){
     return correct_index;
 }
 
+int AI::maxIDX(){
+    return max_index;
+}
+
+int AI::corrBKT(){
+    return correct_bucket;
+}
+
+int AI::maxBKT(){
+    return max_bucket;
+}
+
 int AI::getBucket(int filter, int ans){
     return bucket_arr[filter][ans];
 }
@@ -268,14 +270,14 @@ void AI::initTable(){
             }
             for(int c = 0; c < StrLen; c++){
                 if(pool[a][c] == pool[b][c]){
-                    val += (2<<(2*c));
+                    val += (1<<(2*c));
                     used[pool[b][c]-'a'] -= 1;
                 }
             }
             for(int c = 0; c < StrLen; c++){
                 if(pool[a][c] != pool[b][c] && used[pool[a][c]-'a'] != 0){
                     used[pool[a][c]-'a'] -= 1;
-                    val += (1<<(2*c));
+                    val += (2<<(2*c));
                 }
             }
             buf[b] = val;
@@ -285,7 +287,7 @@ void AI::initTable(){
     return;
 }
 
-int AI::solution(int depth, int mode){
+std::string AI::solution(int depth, int mode){
     int returnval = -1;
     switch(mode){
         case 0:
@@ -299,33 +301,47 @@ int AI::solution(int depth, int mode){
             break;
     }
     Mask = returnval;
-    return returnval;
+    std::string Ans = pool[returnval];
+    for(int a = 0; a < StrLen; a++){
+        if(caps[a]){
+            Ans[a] = Ans[a] - 'a' + 'A';
+        }
+    }
+    return Ans;
 }
 
 bool AI::response(std::string str){
     int bucket_IDX = 0;
+    int IDX = 0;
     for(int a = 0; a < StrLen; a++){
+        IDX += ((str[a]-'0') << (3*a));
         switch(str[a]){
             case '0':
                 break;
+            case '3':
+                caps[a] = 1-caps[a];
             case '1':
-                bucket_IDX += (2 << (2*a));
-                break;
-            case '2':
                 bucket_IDX += (1 << (2*a));
                 break;
+            case '4':
+                caps[a] = 1-caps[a];
+            case '2':
+                bucket_IDX += (2 << (2*a));
+                break;
             default:
-                std::cout << "Error!" << std::endl;
+                std::cerr << "Error!" << std::endl;
                 break;
         }
     }
-    if(bucket_IDX == correct_index){
+    //std::cout << bucket_IDX << " " << IDX << std::endl;
+    if(IDX == correct_index){
         return true;
     }
     std::vector<int> newlist;
     for(int a = 0; a < node->size(); a++){
         if(getBucket(Mask, (*node)[a]) == bucket_IDX){
             newlist.push_back((*node)[a]);
+            //std::cout << pool[newlist.back()] << std::endl;
         }
     }
     delete node;

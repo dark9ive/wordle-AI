@@ -2,6 +2,8 @@
 #include<vector>
 #include<ctime>
 
+#include<unistd.h>
+
 #include"framework.h"
 #include"AI.h"
 
@@ -50,28 +52,23 @@ void test(std::string QFN){
     std::vector<int> dist(11, 0);
     for(int a = 0; a < 2315; a++){
         Game.set_ans(a);
+        //std::cout << "Answer set." << std::endl;
         AI ai(QFN);
         int count = 0;
+        //std::cout << "Start Guessing..." << std::endl;
         while(1){
-            int solu = ai.solution(1, 1);
-            int res = Game.test_ans(ai[solu]);
+            std::string AIGuess = ai.solution(1, 1);
+            //std::cout << count+1 << ": " << AIGuess << std::endl;
+            int res = Game.test_ans(AIGuess);
             total_guess++;
             count++;
             std::string resstr;
+            //std::cout << res << " ";
             for(int b = 0; b < ai.getLen(); b++){
-                switch(res&3){
-                    case 0:
-                        resstr += "0";
-                        break;
-                    case 1:
-                        resstr += "2";
-                        break;
-                    case 2:
-                        resstr += "1";
-                        break;
-                }
-                res >>= 2;
+                resstr += (char)((res&7) + '0');
+                res >>= 3;
             }
+            //std::cout << resstr << std::endl;
             if(ai.response(resstr)){
                 dist[count]++;
                 break;
@@ -109,25 +106,16 @@ void HWMain(std::string QFN, std::string IFname, std::string OFname){
         Game.start(Qs[a]);
         int count = 1;
         while(1){
-            int solu = ai.solution(1, 1);
-            Outfile << count << "; " << ai[solu] << "; " ;
-            int res = Game.test_ans(ai[solu]);
-            Outfile << Game.result(res);
+            std::string AIGuess = ai.solution(1, 1);
+            Outfile << count << "; " << AIGuess << "; " ;
+            int res = Game.test_ans(AIGuess);
+            Outfile << Game.result(res) << std::endl;
             std::string resstr;
             for(int b = 0; b < ai.getLen(); b++){
-                switch(res&3){
-                    case 0:
-                        resstr += "0";
-                        break;
-                    case 1:
-                        resstr += "2";
-                        break;
-                    case 2:
-                        resstr += "1";
-                        break;
-                }
-                res >>= 2;
+                resstr += (char)((res&7) + '0');
+                res >>= 3;
             }
+            //std::cout << resstr << std::endl;
             if(ai.response(resstr)){
                 Outfile << count << std::endl;
                 break;
@@ -136,6 +124,17 @@ void HWMain(std::string QFN, std::string IFname, std::string OFname){
         }
     }
     Outfile.close();
+}
+
+int EZtest(std::string QFN){
+    game Game(QFN);
+    std::string buf;
+    while(std::cin >> buf){
+        Game.start(buf);
+        std::cin >> buf;
+        std::cout << Game.result(Game.test_ans(buf));
+    }
+    return 0;
 }
 
 int main(int argc, char* argv[]){
@@ -153,11 +152,20 @@ int main(int argc, char* argv[]){
             break;
         case 1:
             if(argc != 2){
-                std::cerr << "Usage: " << argv[0] << " <Wordlist> <Answer_list> <Output_file>" << std::endl;
+                std::cerr << "Usage: " << argv[0] << " <Wordlist>" << std::endl;
             }
             else{
                 std::string QFN(argv[1]);
                 test(QFN);
+            }
+            break;
+        case 2:
+            if(argc != 2){
+                std::cerr << "Usage: " << argv[0] << " <Wordlist>" << std::endl;
+            }
+            else{
+                std::string QFN(argv[1]);
+                EZtest(QFN);
             }
             break;
         default:

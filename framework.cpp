@@ -59,10 +59,14 @@ void game::print_status(){
 std::string game::result(int val){
     std::string returnval;
     for(int a = 0; a < StrLen; a++){
-        if( a==0 )
+        if(a==0){
             returnval += "\"";
-        else
+        }
+        else{
             returnval += ","; // print some element
+        }
+        returnval += (char)((val&7) + '0');
+        /*
         switch(val & 3){
             case 0:
                 returnval += "0"; // change '_' to '0'
@@ -76,9 +80,10 @@ std::string game::result(int val){
             default:
                 std::cerr << "Error!" << std::endl;
         }
-        val >>= 2;
+        */
+        val >>= 3;
     }
-    returnval += "\"\n";
+    returnval += "\"";
     return returnval;
 }
 
@@ -100,20 +105,44 @@ void game::start(std::string q){
 
 int game::test_ans(std::string input){
     int returnval = 0;
-    int used[26] = {0};
-    for(int a = 0; a < StrLen; a++){
-        used[ans[a]-'a'] += 1;
-    }
+    int used['z'-'A'+1] = {0};
     for(int a = 0; a < StrLen; a++){
         if(input[a] == ans[a]){
-            returnval += (2<<(2*a));
-            used[input[a]-'a'] -= 1;
+            returnval += (1<<(3*a));
+        }
+        else if(input[a] == (ans[a] - 'a' + 'A') || input[a] == (ans[a] - 'A' + 'a')){
+            returnval += (3<<(3*a));
+        }
+        else{
+            used[ans[a]-'A'] += 1;
         }
     }
     for(int a = 0; a < StrLen; a++){
-        if(input[a] != ans[a] && used[input[a]-'a'] != 0){
-            returnval += (1<<(2*a));
-            used[input[a]-'a'] -= 1;
+        if(returnval & (7 << (3*a))){
+            continue;
+        }
+        if(used[input[a]-'A'] != 0){
+            returnval += (2<<(3*a));
+            used[input[a]-'A'] -= 1;
+        }
+    }
+    for(int a = 0; a < StrLen; a++){
+        if(returnval & (7 << (3*a))){
+            continue;
+        }
+        else{
+            if((input[a]-'A') > 25){
+                if(used[input[a]-'a'] != 0){
+                    returnval += (4<<(3*a));
+                    used[input[a]-'a'] -= 1;
+                }
+            }
+            else{
+                if(used[input[a]-'A'+'a'-'A'] != 0){
+                    returnval += (4<<(3*a));
+                    used[input[a]-'A'+'a'-'A'] -= 1;
+                }
+            }
         }
     }
     return returnval;

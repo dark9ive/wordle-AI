@@ -25,22 +25,30 @@ class AI{
         std::vector<std::string> pool;
         std::vector<std::string> q_pool;
         std::vector<std::vector<int>> bucket_arr;
+        std::vector<int> caps;
         int StrLen;
         int correct_index;
+        int max_index;
+        int correct_bucket;
+        int max_bucket;
         AI_node* node;
         int Mask;
+        //std::string ans;
     public:
         AI(std::string QFN);
-        AI(std::string QFN, std::string TFN);
+        //AI(std::string QFN, std::string TFN);     //  Removed, implement this method if necessary.
         std::string operator[](int IDX);
         int psize();
         int qsize();
         int getLen();
         int corrIDX();
+        int maxIDX();
+        int corrBKT();
+        int maxBKT();
         int getBucket(int filterIDX, int ansIDX);
         void initTable();
         bool response(std::string str);
-        int solution(int depth, int mode);
+        std::string solution(int depth, int mode);
 };
 
 #endif
