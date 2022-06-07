@@ -157,13 +157,24 @@ int game::test_original_ans(std::string input){
     for(int a = 0; a < StrLen; a++){
         if(input[a] == ans[a] || input[a]+32 == ans[a]){
             //std::cout << input[a] << ", " << original_ans[a] << std::endl;
-            if(input[a] == original_ans[a]){
+            if(input[a] == original_ans[a] && original_used[input[a]-'A'] != 0){
                 returnval += (1<<(3*a));
+                original_used[input[a]-'A'] -= 1;
             }           
             else{
-                returnval += (3<<(3*a));
-            }     
-            original_used[input[a]-'A'] -= 1;
+                if( input[a]-'a' >= 0 ){
+                    if(original_used[input[a]-'A'-32] != 0){
+                        returnval += (3<<(3*a));
+                        original_used[input[a]-'A'-32] -= 1;
+                    }
+                }
+                else{
+                    if(original_used[input[a]-'A'+32] != 0){
+                        returnval += (3<<(3*a));
+                        original_used[input[a]-'A'+32] -= 1;
+                    }
+                }                
+            }             
         }
     }
     for(int a = 0; a < StrLen; a++){
@@ -175,7 +186,19 @@ int game::test_original_ans(std::string input){
             continue;
         }             
         // special for "4" only get the sub
-        if(input[a] != original_ans[a] && original_used[input[a]-'A'] == 0){
+        if(input[a] != original_ans[a]){
+            int t = 0;
+            for(int b = a + 1; b < StrLen; b++){ //input >> b
+                for(int c = 0; c < StrLen; c++){
+                    if(input[b] != original_ans[c] && original_used[input[b]-'A'] != 0){
+                        if( input[b]==input[a] || input[b]==input[a]+32 || input[b]+32==input[a] ){
+                            t = 1;
+                        }
+                    }
+                }
+            }
+            if( t == 1 )
+                continue;
             if( input[a]-'a' >= 0 ){
                 if(original_used[input[a]-'A'-32] != 0){
                     returnval += (4<<(3*a));
@@ -183,7 +206,7 @@ int game::test_original_ans(std::string input){
                 }
             }
             else{
-                if(original_used[input[a]-'A'+32] != 0){
+                if(original_used[input[a]-'A'+32] != 0){//&& original_used[input[a]-'A'] == 0
                     returnval += (4<<(3*a));
                     original_used[input[a]-'A'+32] -= 1;
                 }                

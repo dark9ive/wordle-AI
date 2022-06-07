@@ -10,7 +10,7 @@
 #include"AI.h"
 
 #define MainMode 0
-#define TOTAL 5000
+#define TOTAL 2500
 
 /*
 int human_play(){
