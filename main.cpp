@@ -7,7 +7,7 @@
 #include"framework.h"
 #include"AI.h"
 
-#define MainMode 0
+#define MainMode 3
 /*
 int human_play(){
     game Game;
@@ -22,30 +22,30 @@ int human_play(){
     }
     return 0;
 }
-
-int ai_solve(){
-//int main(){
+*/
+int ai_solve(std::string QFN){
     while(1){
         std::cout << "Initialize new AI..." << std::endl;
-        AI ai;
+        AI ai(QFN);
         clock_t start_clock = clock();
-        int solu = ai.solution(1, 1);
-        std::cout << "Best start: " << ai[solu] << std::endl;
+        std::string AI_Guess = ai.solution(1, 1);
+        std::cout << "Guess: " << AI_Guess << std::endl;
         std::cout << "Time used: " << ((double)(clock()-start_clock)) / CLOCKS_PER_SEC << std::endl;
         std::string str;
         while(std::cin >> str){
             if(ai.response(str)){
                 break;
             }
+            std::cout << "Meow!" << std::endl;
             start_clock = clock();
-            solu = ai.solution(1, 1);
-            std::cout << "Best start: " << ai[solu] << std::endl;
+            AI_Guess = ai.solution(1, 1);
+            std::cout << "Guess: " << AI_Guess << std::endl;
             std::cout << "Time used: " << ((double)(clock()-start_clock)) / CLOCKS_PER_SEC << std::endl;
         }
     }
     return 0;
 }
-*/
+
 void test(std::string QFN){
     game Game(QFN);
     int total_guess = 0;
@@ -166,6 +166,15 @@ int main(int argc, char* argv[]){
             else{
                 std::string QFN(argv[1]);
                 EZtest(QFN);
+            }
+            break;
+        case 3:
+            if(argc != 2){
+                std::cerr << "Usage: " << argv[0] << " <Wordlist>" << std::endl;
+            }
+            else{
+                std::string QFN(argv[1]);
+                ai_solve(QFN);
             }
             break;
         default:

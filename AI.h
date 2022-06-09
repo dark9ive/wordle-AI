@@ -6,6 +6,7 @@ class AI;
 
 #include<utility>
 #include<string>
+#include<cfloat>
 #include"framework.h"
 
 class AI_node{
@@ -18,7 +19,7 @@ class AI_node{
         int size();
         std::pair<int, int> ab(int depth, int max_val_glob);
         std::pair<int, int> full(int depth);
-        std::pair<int, int> full_exp(int depth);
+        std::pair<int, double> full_exp(int depth);
 };
 class AI{
     private:
@@ -33,6 +34,7 @@ class AI{
         int max_bucket;
         AI_node* node;
         int Mask;
+        bool caps_lock;
         //std::string ans;
     public:
         AI(std::string QFN);

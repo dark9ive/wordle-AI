@@ -10,24 +10,21 @@ AI_node::AI_node(std::vector<int> list, AI* ds){
     DS = ds;
 }
 
-std::pair<int, int> AI_node::full_exp(int depth){
+std::pair<int, double> AI_node::full_exp(int depth){
     int psize = DS->psize();
     int qsize = indexlist.size();
     int min_IDX = -1;
-    int min_val = 0x7FFFFFFF;
+    double min_val = DBL_MAX;
     if(qsize == 0){
-        return std::pair<int, int>(min_IDX, -1);
+        return std::pair<int, double>(min_IDX, -1);
     }
     for(int a = 0; a < psize; a++){
-        if(depth == 2){
-            std::cout << a << std::endl;
-        }
         std::vector<int> bucket[(DS->maxBKT())+1];
         for(int b = 0; b < qsize; b++){
             int bucketIDX = DS->getBucket(a, indexlist[b]);
             bucket[bucketIDX].push_back(indexlist[b]);
         }
-        int recuans[(DS->maxBKT())+1] = {0};
+        double recuans[(DS->maxBKT())+1] = {0};
         if(depth > 1){
             for(int b = 0; b < ((DS->maxBKT())+1); b++){
                 AI_node node(bucket[b], DS);
@@ -39,33 +36,35 @@ std::pair<int, int> AI_node::full_exp(int depth){
                 recuans[b] = bucket[b].size();
             }
         }
-        int exp_val = 0;
+        double exp_val = 0;
         for(int b = 0; b < (DS->maxBKT())+1; b++){
             if(recuans[b] == 0){
                 continue;
             }
-            exp_val += recuans[b]*log2(recuans[b]);
+            double prob = (double)recuans[b]/(double)qsize;
+            exp_val += ((prob)*log2(prob));
+            //exp_val += (recuans[b])*log2(recuans[b]);
         }
+        if(exp_val == 0){
+            /*
+            for(int b = 0; b < (DS->maxBKT())+1; b++){
+                std::cout << recuans[b] << "Meow ";
+            }
+            std::cout << std::endl;
+            */
+        }
+        //std::cout << exp_val << " " << min_val << std::endl;
         if (exp_val < min_val){
+            //std::cout << "found better: " << (*DS)[a] << ", val = " << exp_val << std::endl;
             min_IDX = a;
             min_val = exp_val;
-            /*
-            if(depth == 2){
-                std::cout << "found better: " << (*DS)[a] << ", val = " << exp_val << std::endl;
-            }
-            */
         }
         else if(exp_val == min_val && recuans[DS->corrBKT()] == 1){
             min_IDX = a;
             min_val = exp_val;
-            /*
-            if(depth == 2){
-                std::cout << "found better: " << (*DS)[a] << ", val = " << exp_val << std::endl;
-            }
-            */
         }
     }
-    return std::pair<int, int>(min_IDX, min_val);
+    return std::pair<int, double>(min_IDX, min_val);
 }
 
 std::pair<int, int> AI_node::full(int depth){
@@ -211,6 +210,7 @@ AI::AI(std::string QFN){
 
     initTable();
     caps.resize(StrLen, 0);
+    caps_lock = true;
 
     std::vector<int> buf;
     for(int a = 0; a < qsize(); a++){
@@ -301,9 +301,10 @@ std::string AI::solution(int depth, int mode){
             break;
     }
     Mask = returnval;
+    //std::cout << " " << Mask << std::endl;
     std::string Ans = pool[returnval];
     for(int a = 0; a < StrLen; a++){
-        if(caps[a]){
+        if(caps[a] && !caps_lock){
             Ans[a] = Ans[a] - 'a' + 'A';
         }
     }
@@ -312,6 +313,7 @@ std::string AI::solution(int depth, int mode){
 
 bool AI::response(std::string str){
     int bucket_IDX = 0;
+    int unknown_mask = 0;
     int IDX = 0;
     for(int a = 0; a < StrLen; a++){
         IDX += ((str[a]-'0') << (3*a));
@@ -319,31 +321,46 @@ bool AI::response(std::string str){
             case '0':
                 break;
             case '3':
-                caps[a] = 1-caps[a];
+                bucket_IDX += (1 << (2*a));
+                break;
             case '1':
                 bucket_IDX += (1 << (2*a));
                 break;
             case '4':
-                caps[a] = 1-caps[a];
+                bucket_IDX += (2 << (2*a));
+                break;
             case '2':
                 bucket_IDX += (2 << (2*a));
+                break;
+            case '5':
+                unknown_mask += (3 << (2*a));
                 break;
             default:
                 std::cerr << "Error!" << std::endl;
                 break;
         }
     }
-    //std::cout << bucket_IDX << " " << IDX << std::endl;
+    unknown_mask = ~unknown_mask;
     if(IDX == correct_index){
         return true;
     }
     std::vector<int> newlist;
     for(int a = 0; a < node->size(); a++){
-        if(getBucket(Mask, (*node)[a]) == bucket_IDX){
+        if((getBucket(Mask, (*node)[a]) & unknown_mask) == (bucket_IDX & unknown_mask)){
             newlist.push_back((*node)[a]);
             //std::cout << pool[newlist.back()] << std::endl;
         }
     }
+    //std::cout << newlist.size();
+    if(newlist.size() == 1){
+        caps_lock = false;
+        for(int a = 0; a < StrLen; a++){
+            if(str[a] == '3'){
+                caps[a] = 1-caps[a];
+            }
+        }
+    }
+
     delete node;
     node = new AI_node(newlist, this);
     Mask = -1;
